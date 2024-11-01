@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Satellite Image Prediction</title>
+<style>
+/* Existing CSS code */
+body {
+    background-image: url('/static/bg.png');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: #fff;
+}
+.navbar {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    background-color: #6d0303;
+    padding: 20px;
+    text-align: center;
+    font-size: 1.2em;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.navbar a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 20px;
+    transition: color 0.3s;
+    font-size: 25px;
+    font-weight: bold;
+}
+.navbar a:hover {
+    color: #f0a500;
+    background-color: #0c130d;
+}
+.container {
+    background-color:#e9dfe3;
+    color: black;
+    border-radius: 10px;
+    border: 2px solid red;
+    padding: 20px;
+    text-align: center;
+    width: 90%;
+    max-width: 700px;
+}
+input[type="file"] {
+    margin: 20px 0;
+}
+.button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #28a745;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 1em;
+}
+.button:hover {
+    background-color: #0c130d;
+}
+/* Centering the preview image */
+.preview-image {
+    width: 100%;
+    max-width: 300px;
+    margin: 20px auto;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    display: block;
+}
+</style>
+</head>
+<body>
+<nav class="navbar">
+    <a href="#overview">Overview of Satellite Image Classification</a>
+    <a href="#how-to-predict">How Can You Predict</a>
+    <a href="#contact-us">Contact Us</a>
+</nav>
+
+<div class="container">
+    <h1>Upload a Satellite Image for Prediction</h1>
+    <form action="/" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*" required onchange="previewImage(event)">
+        <br>
+        <!-- Centered Image Preview Element -->
+        <img id="imagePreview" class="preview-image" src="#" alt="Preview Image" style="display:none;">
+        <br>
+        <button type="submit" class="button">Predict</button>
+    </form>
+    <h3 id="result"></h3>
+    <h3 id="confidence"></h3>
+</div>
+
+<script>
+// Function to preview selected image
+function previewImage(event) {
+    const imagePreview = document.getElementById('imagePreview');
+    const file = event.target.files[0];
+    if (file) {
+        imagePreview.src = URL.createObjectURL(file);
+        imagePreview.style.display = 'block';
+    } else {
+        imagePreview.style.display = 'none';
+    }
+}
+
+const form = document.querySelector('form');
+form.onsubmit = async (e) => {
+    e.preventDefault();
+
+    const fileInput = document.querySelector('input[type="file"]');
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const response = await fetch('/', { method: 'POST', body: formData });
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        document.getElementById('result').textContent = 
+            `Predicted Category: ${data.prediction}`;
+        document.getElementById('confidence').textContent = 
+            `Confidence Level: ${data.confidence}`;
+    } catch (error) {
+        document.getElementById('result').textContent = 'Error: ' + error.message;
+    }
+};
+</script>
+</body>
+</html>
